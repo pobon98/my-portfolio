@@ -1,5 +1,5 @@
 // src/App.js
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "./index.css";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaGithub, FaLinkedin, FaEnvelope, FaSun, FaMoon } from "react-icons/fa";
@@ -49,6 +49,10 @@ export default function App() {
   const [modalOpen, setModalOpen] = useState(false);
   const [activeProject, setActiveProject] = useState(null);
 
+  // model-viewer state
+  const [modelLoaded, setModelLoaded] = useState(false);
+  const modelRef = useRef(null);
+
   // Persist dark mode to <html> class and localStorage
   useEffect(() => {
     if (dark) document.documentElement.classList.add("dark");
@@ -57,6 +61,21 @@ export default function App() {
       localStorage.setItem("prefers-dark", dark ? "true" : "false");
     } catch {}
   }, [dark]);
+
+  // attach load listener to model-viewer (custom element)
+  useEffect(() => {
+    const el = modelRef.current;
+    if (!el) return;
+    const onLoad = () => setModelLoaded(true);
+    // model-viewer fires a "load" or "poster-visibility" events — 'load' works for many builds
+    el.addEventListener("load", onLoad);
+    // as a fallback, also listen to 'progress' and 'poster-visibility'
+    el.addEventListener("poster-visibility", onLoad);
+    return () => {
+      el.removeEventListener("load", onLoad);
+      el.removeEventListener("poster-visibility", onLoad);
+    };
+  }, [modelRef]);
 
   // Motion variants
   const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
@@ -102,7 +121,7 @@ export default function App() {
           </nav>
 
           <div className="flex items-center gap-3 text-lg">
-            <a href="https://github.com/YOUR_GITHUB_USERNAME" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-500">
+            <a href="https://github.com/pobon98" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-500">
               <FaGithub />
             </a>
             <a href="https://www.linkedin.com/in/YOUR_LINKEDIN_PROFILE" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-500">
@@ -147,17 +166,49 @@ export default function App() {
               <a href="/resume.pdf" download className="inline-flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-100 transition">Resume</a>
             </motion.div>
 
-            {/* social */}
+            {/* social */} 
             <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }} className="flex items-center gap-5 text-gray-600 dark:text-gray-400 mt-3 text-xl">
               <a href="mailto:pobandas33@gmail.com" className="hover:text-indigo-500"><FaEnvelope /></a>
-              <a href="https://github.com/YOUR_GITHUB_USERNAME" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-500"><FaGithub /></a>
+              <a href="https://github.com/pobon98" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-500"><FaGithub /></a>
               <a href="https://www.linkedin.com/in/YOUR_LINKEDIN_PROFILE" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-500"><FaLinkedin /></a>
             </motion.div>
           </motion.div>
 
+          {/* ---------- AR / model-viewer block (replaces photo) ---------- */}
           <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.45 }} className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow relative z-10">
-            <img src="/profile.jpg" alt="Poban Das" className="w-full h-64 object-cover rounded-lg" onError={(e) => (e.target.style.display = "none")} />
-            <span className="absolute text-gray-400 left-1/2 -translate-x-1/2 top-1/2">Your Photo</span>
+            <div className="w-full h-64 rounded-lg bg-gray-100 dark:bg-gray-800 overflow-hidden flex items-center justify-center relative">
+              {/* model-viewer: place public/ar-model.glb or change src to an external .glb URL */}
+              <model-viewer
+                ref={modelRef}
+                src="/ar-model.glb"
+                ios-src=""
+                alt="3D AR model"
+                ar
+                ar-modes="webxr scene-viewer quick-look"
+                camera-controls
+                auto-rotate
+                style={{ width: "100%", height: "100%", display: modelLoaded ? "block" : "none" }}
+              />
+              {/* fallback SVG (shows until model loads or if model not present) */}
+              {!modelLoaded && (
+                <div className="absolute inset-0 flex items-center justify-center p-6">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" className="w-40 h-40">
+                    <defs>
+                      <linearGradient id="g1" x1="0" x2="1">
+                        <stop offset="0" stopColor="#6366F1" />
+                        <stop offset="1" stopColor="#EC4899" />
+                      </linearGradient>
+                    </defs>
+                    <rect width="120" height="120" rx="18" fill="url(#g1)" opacity="0.12" />
+                    <g transform="translate(20,20)" fill="none" stroke="#6B7280" strokeWidth="2">
+                      <rect x="0" y="0" width="80" height="60" rx="6" opacity="0.14" />
+                      <path d="M4 44 L20 28 L40 48 L60 20 L76 36" stroke="#4F46E5" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                    </g>
+                    <text x="60" y="105" fontSize="10" textAnchor="middle" fill="#374151">AR Preview</text>
+                  </svg>
+                </div>
+              )}
+            </div>
 
             <div className="mt-4 grid grid-cols-2 gap-3">
               <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg text-sm">
@@ -178,6 +229,7 @@ export default function App() {
               </div>
             </div>
           </motion.div>
+
         </section>
 
         {/* ABOUT */}
