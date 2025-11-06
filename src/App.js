@@ -3,6 +3,7 @@ import React, { useEffect, useState, useRef } from "react";
 import "./index.css";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaGithub, FaLinkedin, FaEnvelope, FaSun, FaMoon } from "react-icons/fa";
+import { FaDownload } from "react-icons/fa"; // add at top with other imports
 
 import ParticleBackground from "./components/ParticleBackground";
 import Typewriter from "./components/Typewriter";
@@ -124,7 +125,7 @@ export default function App() {
             <a href="https://github.com/pobon98" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-500">
               <FaGithub />
             </a>
-            <a href="https://www.linkedin.com/in/YOUR_LINKEDIN_PROFILE" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-500">
+            <a href="https://www.linkedin.com/in/poban-das-0691a1202" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-500">
               <FaLinkedin />
             </a>
 
@@ -163,14 +164,17 @@ export default function App() {
             {/* buttons */}
             <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="flex flex-wrap gap-3">
               <a href="#projects" className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:opacity-90 transition">View Projects</a>
-              <a href="/resume.pdf" download className="inline-flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-100 transition">Resume</a>
+              <a href="/resume.pdf" download className="ml-4 inline-flex items-center gap-2 px-3 py-1.5 border rounded-md text-sm">
+               <FaDownload /> <span>Download Resume</span>
+            </a>
+
             </motion.div>
 
             {/* social */} 
             <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }} className="flex items-center gap-5 text-gray-600 dark:text-gray-400 mt-3 text-xl">
               <a href="mailto:pobandas33@gmail.com" className="hover:text-indigo-500"><FaEnvelope /></a>
               <a href="https://github.com/pobon98" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-500"><FaGithub /></a>
-              <a href="https://www.linkedin.com/in/YOUR_LINKEDIN_PROFILE" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-500"><FaLinkedin /></a>
+              <a href="https://www.linkedin.com/in/poban-das-0691a1202" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-500"><FaLinkedin /></a>
             </motion.div>
           </motion.div>
 
